@@ -1,6 +1,7 @@
 import sys
 from ckdPreProcData import *
 from ckdFeatureSelection import *
+from ckdClassifer import *
 
 
 def main():
@@ -11,13 +12,16 @@ def main():
     input_data = '/Users/shimriteliezer/Documents/testProjects/CKDanalysis/CKD.csv'
     # init DataLoader
     dl = DataLoader(input_data)
-    # preProcess
+    # preProcess (clean, impute, scale, handle outliers and correlated features)
     dl.load_and_preprocess_data()
-    # init FeatureSelection
-    run_mode = 1
-    fs = FeatureSelectionRun(run_mode, dl)
-    fs.run_kbest_model()
-    fs.run_random_forest_model()
+    # FeatureSelection
+    run_mode = 2
+    fs = FeatureSelectionRun(run_mode, dl)      # init using the Data loaded
+    fs.run_fs_model()
+    # classifier        (TBD - cross validation using sub-sampling)
+    run_mode = 3
+    crf = ClassifierRun(run_mode, dl, fs)        # init using the Data loaded and the selected features
+    crf.classify_by_mode()
 
     return 0
 

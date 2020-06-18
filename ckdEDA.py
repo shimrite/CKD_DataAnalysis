@@ -45,7 +45,7 @@ class EDA(object):
             self.df_outliers[key] = curr_above_std + curr_below_std
             if self.df_outliers[key] > 0: #outliers_limit:
                 self.outliers_col_2b_dropped = self.outliers_col_2b_dropped + [key]
-                self.df_2_explore.boxplot(column=key)
+               # self.df_2_explore.boxplot(column=key)
         self.df_2_explore.drop(columns=self.outliers_col_2b_dropped)
 
     def correlated_features_detection(self):

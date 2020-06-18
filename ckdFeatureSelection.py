@@ -28,7 +28,37 @@ class FeatureSelectionRun(object):
         self.col_names = self.x_train.columns.values
         self.params = FeatureSelectionParams()
         self.selected_features_indexes = []
-        self.selected_features_names = []
+        self.selected_features_names = [] # not in use TBD
+
+    def run_fs_model(self):
+        # run the feature selection model by run_mode:
+        # run_mode = 1 --> kbest
+        # run_mode = 2 --> randomforest
+        # run_mode = 3 --> both and merge selected features
+        if self.run_mode==1 :
+            self.run_kbest_model()
+        elif self.run_mode==2 :
+            self.run_random_forest_model()
+        else:
+            self.run_kbest_model()
+            kbf = self.selected_features_indexes
+            self.run_random_forest_model()
+            rff = self.selected_features_indexes
+            self.merge_best_features(kbf, rff, self.params.k)
+
+    def merge_best_features(self, a, b, n):
+        # this is a naive merge:
+        # 1. take the intersection set
+        # 2. if the intersection set is less than n - take the best 3 features of each set
+        # TBD - merge by features scores, similarity, strength
+        intersect = set(a).intersection(b)
+        next_best_features = n-len(intersect)
+        if next_best_features > 0 :
+            a_cont = [value for value in a if value not in intersect]
+            b_cont = [value for value in b if value not in intersect]
+            self.selected_features_indexes = intersect + a_cont[:int(next_best_features/2)] + b_cont[:int(next_best_features/2)]
+        else:
+            self.selected_features_indexes = intersect
 
     def run_kbest_model(self):
         # K best by chi^2 statistic model

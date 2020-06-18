@@ -15,9 +15,9 @@ class DataLoaderParams(object):
         self.p_na_thresh = 0
 
     def init_params(self):
-        self.p_test_size = 0.33
-        self.p_random_state = 48
-        self.p_na_thresh = 0.75
+        self.p_test_size = 0.33     # train-test split
+        self.p_random_state = 48    # train-test split
+        self.p_na_thresh = 0.75     # removal features with NA val > thresh
         return
 
     def update_params(self, tst_sz, rnd_st, na_thrsh):
@@ -45,16 +45,17 @@ class DataLoader(object):
         self.x_test = []
         self.y_train = []
         self.y_test = []
-        self.x_train_valid = []
+        self.x_train_valid = []     # data after duplicates removal, NA removal and imputation
         self.x_test_valid = []
         self.params = DataLoaderParams()
-        self.params.init_params()  # default values
-        self.cat_col_list_train = []
-        self.cat_values_dict = {}
-        self.mean_num_values = []
-        self.cat2num_dict = {}
-        self.num_col_list = []
-        self.y_cat2num_dict = {}
+        self.params.init_params()       # default values
+        self.valid_columns = []     # features remained after NA removal
+        self.cat_col_list = []      # categorical features
+        self.cat_values_dict = {}   # map between categorical feature and its top value (most common)
+        self.mean_num_values = []   # map between numerical feature and its mean value
+        self.cat2num_dict = {}      # map between categorical values to numeric labeling (one-hot)
+        self.num_col_list = []      # numerical features
+        self.y_cat2num_dict = {}    # labeling (one-hot)
 
     def input_2_train_test(self):
         # this method load the data set and splits the data into train and test sets
@@ -78,39 +79,37 @@ class DataLoader(object):
         # 1. drop features (columns) with NA > 75%
         x_train_val = self.x_train.dropna(axis=1, thresh= self.x_train.shape[0] * self.params.p_na_thresh)
         print("train data set shape after NA droping: " + str(x_train_val.shape))
-        train_val_columns = x_train_val.columns
+        self.valid_columns = x_train_val.columns
         # 2. CATEGORICAL val - clean & impute
         # remove "typo" characters
         # create categorical common values dictionary - cat_values_dict - per att its most common value (top)
         # fill NA values with the dictionary values
-        self.cat_col_list_train = x_train_val.select_dtypes(include=np.object).columns.tolist()
-        for key in self.cat_col_list_train:
+        self.cat_col_list = x_train_val.select_dtypes(include=np.object).columns.tolist()
+        for key in self.cat_col_list:
             tmp = pd.to_numeric(x_train_val.loc[:, key].str.strip().str.strip('?'), errors='ignore')
             x_train_val.loc[:, key] = tmp
             if x_train_val.loc[:, key].dtype == object:
                 self.cat_values_dict[key] = x_train_val.loc[:, key].describe().top
-        self.cat_col_list_train = x_train_val.select_dtypes(include=np.object).columns.tolist() # after removal of numerical columns
+        self.cat_col_list = x_train_val.select_dtypes(include=np.object).columns.tolist() # after removal of numerical columns
         x_train_val.fillna(value=self.cat_values_dict, inplace=True)
         # 3. NUMERICAL val - impute  (mean/median/corr)
         num_desc = x_train_val.describe() # note, this is executed only on numerical data
         self.mean_num_values = num_desc.loc['mean']
         x_train_val.fillna(value=self.mean_num_values, inplace=True)
         self.x_train_valid = x_train_val
-        #self.x_train_valid.info()
         # -- handle test data -- get only valid columns, fill NA, scale/fit
-        x_test_val = self.x_test[train_val_columns]
+        x_test_val = self.x_test[self.valid_columns]
         # clean data
         cat_col_list_test = x_test_val.select_dtypes(include=np.object).columns.tolist()
         for key in cat_col_list_test:
             tmp = pd.to_numeric(x_test_val.loc[:, key].str.strip().str.strip('?'), errors='ignore')
             x_test_val.loc[:, key] = tmp
         cat_col_list_test = x_test_val.select_dtypes(include=np.object).columns.tolist()  # after removal of numeric
-        assert self.cat_col_list_train == cat_col_list_test, "categoriacl columns are differ between train and test sets!"
+        assert self.cat_col_list == cat_col_list_test, "categoriacl columns are differ between train and test sets!"
         # fill NA
         x_test_val.fillna(value=self.mean_num_values, inplace=True)
         x_test_val.fillna(value=self.cat_values_dict, inplace=True)
         self.x_test_valid = x_test_val
-        #self.x_test_valid.info()
         return
 
     def scale_data(self):
@@ -121,16 +120,13 @@ class DataLoader(object):
         self.x_train_valid.loc[:, self.num_col_list] = mms.fit_transform(self.x_train_valid.loc[:, self.num_col_list])
         # CATEGORICAL features scaling
         self.cat2num_dict = {}
-        for key in self.cat_col_list_train: # create categorical values dictionary - per att its optional values and their numerical replacement (top)
+        for key in self.cat_col_list: # create categorical values dictionary - per att its optional values and their numerical replacement (top)
             self.cat2num_dict[key] = {self.x_train_valid.loc[:, key].value_counts().keys()[0]: 0, self.x_train_valid.loc[:, key].value_counts().keys()[1]: 1}
         self.x_train_valid.replace(self.cat2num_dict, inplace=True) # scale categorical data (TBD - onehot!)
-
-        #self.x_train_valid.info()
 
         # scale Test data
         self.x_test_valid.replace(self.cat2num_dict, inplace=True)
         self.x_test_valid.loc[:, self.num_col_list] = mms.fit_transform(self.x_test_valid.loc[:, self.num_col_list])
-        #self.x_test_valid.info()
 
         # scale labels to 0/1
         # for key in y_train.keys():
