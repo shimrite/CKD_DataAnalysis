@@ -15,6 +15,14 @@ this file holds the following pre-process steps:
     5. data scaling
     5. data exploration - features statistics, feature correlation, visualization
     6. correlated features handling (removal vs pca)
+### 3. ckdEDA.py -
+this file holds all Exploration Data Analysis methods:
+    1. high level info on the data set
+    2. features statistics
+    3. feature correlation
+    4. data scaling
+    5. outliers detection
+    6. Visualization
 ### 3. ckdFeatureSelectionRun.py - 
 this file perform feature selection model on the dataset.
 the model selected by run_mode parameter: [1/2/3] stands for [KBest/RandomForest/Both] respectevly
