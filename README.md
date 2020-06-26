@@ -6,6 +6,7 @@ The project contains the following files:
 ### 1. ckdRunDataAnalysisAndPredict.py - 
 the main "run", in order to run this file please update the input_data path.
 this file runs all steps of classification pipeline: 
+
 load and pre-process the data, feature selection, classification.
 ### 2. ckdPreProcData.py - 
 this file holds the following pre-process steps: 
@@ -28,6 +29,7 @@ this file holds all Exploration Data Analysis methods:
     6. Visualization
 ### 3. ckdFeatureSelectionRun.py - 
 this file perform feature selection model on the dataset.
+
 the model selected by run_mode parameter: [1/2/3] stands for [KBest/RandomForest/Both] respectevly
 ### 4. ckdClassifier.py - 
 this file holds the following:
