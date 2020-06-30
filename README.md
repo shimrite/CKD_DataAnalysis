@@ -14,7 +14,7 @@ In order to run the following parameters required:
 - feature_selection_run_mode - 1 / 2 / 3 [kbest/randomforest/testboth]
 - classifier_run_mode - 1 /2 /3 [knn/randomforest/svm]
 
-   ckdRunDataAnalysisAndPredict.py '/Users/.../CKDanalysis/CKD.csv' 2 3
+      ckdRunDataAnalysisAndPredict.py '/Users/.../CKDanalysis/CKD.csv' 2 3
 
 ### 2. ckdPreProcData.py - 
 This file holds the following pre-process steps: 
