@@ -5,11 +5,17 @@ Predicting CKD (chronic kidne diseas) based on subject health records.
 
 The project contains the following files:
 ### 1. ckdRunDataAnalysisAndPredict.py - 
-The main "run", in order to run this file please update the input_data path.
-
-This file runs the classification pipeline including: 
+This File holds the main method running the classification pipeline including: 
 
 Load data and Pre-processing --> Feature selection --> Classification.
+
+In order to run the following parameters required:
+- input_data_path - csv file location
+- feature_selection_run_mode - 1 / 2 / 3 [kbest/randomforest/testboth]
+- classifier_run_mode - 1 /2 /3 [knn/randomforest/svm]
+
+   > ckdRunDataAnalysisAndPredict.py '/Users/.../CKDanalysis/CKD.csv' 2 3
+
 ### 2. ckdPreProcData.py - 
 This file holds the following pre-process steps: 
 
