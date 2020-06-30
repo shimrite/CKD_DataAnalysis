@@ -3,21 +3,19 @@ from sklearn.feature_selection import chi2
 from sklearn.ensemble import RandomForestClassifier
 from ckdPreProcData import *
 
-# this section holds the following:
-# 1. K best by chi^2 statistic model
-# 2. Random Forest model
-# 3. models comparison
-
 
 class FeatureSelectionParams(object):
-
+    # This class holds the default parameters
     def __init__(self):
         super(FeatureSelectionParams, self).__init__()
         self.k = 10
 
 
 class FeatureSelectionRun(object):
-
+    # This Class performs Feature Selection model according the 'run_mode':
+    # run_mode=1: K best by chi^2 statistic model
+    # run_mode=2: Random Forest model
+    # run_mode=3: models merge option
     def __init__(self, input_mode, in_data: DataLoader):
         super(FeatureSelectionRun, self).__init__()
         self.run_mode = input_mode  # 1 / 2 / 3 [kbest/randomforest/testboth]
@@ -32,9 +30,6 @@ class FeatureSelectionRun(object):
 
     def run_fs_model(self):
         # run the feature selection model by run_mode:
-        # run_mode = 1 --> kbest
-        # run_mode = 2 --> randomforest
-        # run_mode = 3 --> both and merge selected features
         if self.run_mode==1 :
             self.run_kbest_model()
         elif self.run_mode==2 :
@@ -47,9 +42,9 @@ class FeatureSelectionRun(object):
             self.merge_best_features(kbf, rff, self.params.k)
 
     def merge_best_features(self, a, b, n):
-        # this is a naive merge:
-        # 1. take the intersection set
-        # 2. if the intersection set is less than n - take the best 3 features of each set
+        # This is a naive merge:
+        # 1. Take the intersection set
+        # 2. If the intersection set is less than n - take the best 3 features of each set
         # TBD - merge by features scores, similarity, strength
         intersect = set(a).intersection(b)
         next_best_features = n-len(intersect)
@@ -63,26 +58,25 @@ class FeatureSelectionRun(object):
     def run_kbest_model(self):
         # K best by chi^2 statistic model
         model = SelectKBest(score_func=chi2, k=self.params.k)
-        fit = model.fit(self.x_train, self.y_train)
-        # summarize scores
+        model_results = model.fit(self.x_train, self.y_train)
+        # Summarize scores
         np.set_printoptions(precision=3)
-        print(fit.scores_)
-        features = fit.transform(self.x_train)
-        # summarize selected features
-        #print(features[0:15, :])  # print data of the K best features
+        print(model_results.scores_)
+        features = model_results.transform(self.x_train)
+        # Summarize selected features
+        # print(features[0:15, :])  # print data of the K best features
         print("--- K Best Features ---")
         print("Features Indx sorted by their score:")
-        print(np.argsort(fit.scores_)[-self.params.k:])  # best K features indexes (10)
+        print(np.argsort(model_results.scores_)[-self.params.k:])  # best K features indexes (10)
         # print("Best Features Data:")
-        # print(self.x_train.values[:15, np.argsort(fit.scores_)[-self.params.k:]])  # print data of the K best features
+        # print(self.x_train.values[:15, np.argsort(model_results.scores_)[-self.params.k:]])  # print data of the K best features
         print("Features Names sorted by their score:")
-        print(sorted(zip(map(lambda x: round(x, 4), fit.scores_), self.col_names), reverse=True))
+        print(sorted(zip(map(lambda x: round(x, 4), model_results.scores_), self.col_names), reverse=True))
         # update features selected
-        self.selected_features_indexes = np.argsort(fit.scores_)[-self.params.k:]
-        self.selected_features_names = sorted(zip(map(lambda x: round(x, 4), fit.scores_), self.col_names), reverse=True)
+        self.selected_features_indexes = np.argsort(model_results.scores_)[-self.params.k:]
+        self.selected_features_names = sorted(zip(map(lambda x: round(x, 4), model_results.scores_), self.col_names), reverse=True)
 
     def run_random_forest_model(self):
-
         # Random Forest model
         model = RandomForestClassifier()
         # Fit the model

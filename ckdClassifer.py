@@ -1,34 +1,31 @@
-from sklearn.feature_selection import SelectKBest
-from sklearn.feature_selection import chi2
-from sklearn.ensemble import RandomForestClassifier
 from sklearn import svm
 from sklearn.metrics import roc_auc_score
 from sklearn import metrics
 from sklearn.calibration import calibration_curve
-from ckdPreProcData import *
+from sklearn.neighbors import KNeighborsClassifier
 from ckdFeatureSelection import *
 import matplotlib.pyplot as plt
 
 
-# this section holds the following:
-# 1. KNN classifier
-# 2. Random Forest classifier
-# 3. SVM classifier
-# 4. classifier analysis (ROC/AUC)
-
-
 class ClassifierParams(object):
-
+    # This class holds the default parameters
     def __init__(self):
         super(ClassifierParams, self).__init__()
         self.k = 10
+    def update_params(self, k_new):
+        self.k = k_new
+        return
 
 
 class ClassifierRun(object):
-
+    # This class perform the following classification models:
+    # 1. KNN classifier
+    # 2. Random Forest classifier
+    # 3. SVM classifier
+    # Also, it analysis (ROC/AUC)
     def __init__(self, run_mode, in_data: DataLoader, in_features: FeatureSelectionRun):
         super(ClassifierRun, self).__init__()
-        self.run_mode = run_mode  # 1 / 2 / 3 [kbest/randomforest/svm]
+        self.run_mode = run_mode  # 1 / 2 / 3 [knn/randomforest/svm]
         self.x_train = in_data.x_train_valid
         self.x_test = in_data.x_test_valid
         self.y_train = in_data.y_train
@@ -51,35 +48,16 @@ class ClassifierRun(object):
         self.classify_model()
 
     def fit_KNN_model(self):
-        # K best by chi^2 statistic model
-        self.model = SelectKBest(score_func=chi2, k=self.params.k)
-        fit = self.model.fit(self.x_train, self.y_train)
-        # summarize scores
-        np.set_printoptions(precision=3)
-        print("--- K Best Features ---")
-        print("Features Indx sorted by their score:")
-        print(np.argsort(fit.scores_)[-self.params.k:])  # best K features indexes (10)
-        print("Features Names sorted by their score:")
-        print(sorted(zip(map(lambda x: round(x, 4), fit.scores_), self.col_names), reverse=True))
-        # update features selected
-        self.selected_features_indexes = np.argsort(fit.scores_)[-self.params.k:]
-        self.selected_features_names = sorted(zip(map(lambda x: round(x, 4), fit.scores_), self.col_names), reverse=True)
+        # K Nearest Neighbours model
+        self.model = KNeighborsClassifier(n_neighbors=self.params.k)
+        # Fit the model
+        self.model.fit(self.x_train, self.y_train)
 
     def fit_random_forest_model(self):
-
         # Random Forest model
         self.model = RandomForestClassifier()
         # Fit the model
         self.model.fit(self.x_train, self.y_train)
-        # summarize selected features
-        print("--- Random Forest Features ---")
-        print("Features Indx sorted by their score:")
-        print(np.argsort(self.model.feature_importances_)[-self.params.k:])  # best K features indexes (10)
-        print("Features Names sorted by their score:")
-        print(sorted(zip(map(lambda x: round(x, 4), self.model.feature_importances_), self.col_names), reverse=True))
-        # update features selected
-        self.selected_features_indexes = np.argsort(self.model.feature_importances_)[-self.params.k:]
-        self.selected_features_names = sorted(zip(map(lambda x: round(x, 4), self.model.feature_importances_), self.col_names), reverse=True)
 
     def fit_svm_model(self):
         self.model = svm.SVC(kernel='linear', C=1.0, probability=True)        # TBD, check data balancing, update class_weight={1: 10})
