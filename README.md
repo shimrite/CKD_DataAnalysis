@@ -8,32 +8,37 @@ The main "run", in order to run this file please update the input_data path.
 
 This file runs the classification pipeline including: 
 
-load and pre-process the data --> feature selection --> classification.
+Load data and Pre-processing --> Feature selection --> Classification.
 ### 2. ckdPreProcData.py - 
 This file holds the following pre-process steps: 
-    1. Load data and initial exploration 
-    2. Split into train and test sets, features(x) and labels(y)
-    3. Data imputation (clean values, NA values)
-    4. Data exploration - outliers detection & handling
-    5. Data scaling
-    5. Data exploration - features statistics, feature correlation, visualization
-    6. Correlated features handling (removal vs pca)
+
+       1. Load data and initial exploration 
+       2. Split into train and test sets, features(x) and labels(y)
+       3. Data imputation (clean values, NA values)
+       4. Data exploration - outliers detection & handling
+       5. Data scaling
+       5. Data exploration - features statistics, feature correlation, visualization
+       6. Correlated features handling (removal vs pca)
 ### 3. ckdEDA.py -
 This file holds all Exploration Data Analysis methods:
-    1. High level info on the data set
-    2. Features statistics
-    3. Feature correlation
-    4. Data scaling
-    5. Outliers detection
-    6. Visualization
+
+       1. High level info on the data set
+       2. Features statistics
+       3. Feature correlation
+       4. Data scaling
+       5. Outliers detection
+       6. Visualization
 ### 3. ckdFeatureSelectionRun.py - 
 This file perform feature selection model on the dataset.
+
     * The feature selection model selected by run_mode parameter: [1/2/3] stands for [KBest/RandomForest/Both] respectevly
 ### 4. ckdClassifier.py - 
 This file holds the following:
-    1. KNN classifier
-    2. Random Forest classifier
-    3. SVM classifier
-    4. Classifier Results Analysis (ROC/AUC)
+
+       1. KNN classifier
+       2. Random Forest classifier
+       3. SVM classifier
+       4. Classifier Results Analysis (ROC/AUC)
+       
     * The classifier model selected by run_mode parameter.
     * The model is performed on the preprocessed data using the selected features from previous steps.
