@@ -49,3 +49,7 @@ This file holds the following:
        
     * The classifier model selected by run_mode parameter.
     * The model is performed on the preprocessed data using the selected features from previous steps.
+    
+### 5. requirementsCKD.txt - environement requirements file
+
+### 6. CKD.csv - data file
