@@ -35,11 +35,11 @@ This file holds all Exploration Data Analysis methods:
        4. Data scaling
        5. Outliers detection
        6. Visualization
-### 3. ckdFeatureSelectionRun.py - 
+### 4. ckdFeatureSelectionRun.py - 
 This file perform feature selection model on the dataset.
 
     * The feature selection model selected by run_mode parameter: [1/2/3] stands for [KBest/RandomForest/Both] respectevly
-### 4. ckdClassifier.py - 
+### 5. ckdClassifier.py - 
 This file holds the following:
 
        1. KNN classifier
@@ -50,6 +50,8 @@ This file holds the following:
     * The classifier model selected by run_mode parameter.
     * The model is performed on the preprocessed data using the selected features from previous steps.
     
-### 5. requirementsCKD.txt - environement requirements file
+### 6. requirementsCKD.txt - environement requirements file
 
-### 6. CKD.csv - data file
+### 7. CKD.csv - data file
+
+### 8. Data_Analysis_Task.doc - data set details
